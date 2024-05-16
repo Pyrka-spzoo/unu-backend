@@ -11,12 +11,14 @@ interface ConnectionController {
 
 }
 
-val Glovo.Companion.players : ConnectionController
-    get() = object : ConnectionController {
+val Glovo.Companion.players : ConnectionController by lazy {
+    object : ConnectionController {
 
-        val _conn : MutableList<ConnectionWS> = CopyOnWriteArrayList<ConnectionWS>()
+        val _conn : MutableList<ConnectionWS> = CopyOnWriteArrayList()
 
         override val connections: MutableList<ConnectionWS>
             get() = _conn
 
+
     }
+}

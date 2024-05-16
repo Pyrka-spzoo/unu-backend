@@ -52,13 +52,13 @@ fun Application.configureSockets() {
         webSocket("/ws") {
             val thisConnection = ConnectionWS(this)
             Glovo.players.connections += thisConnection
+            println(Glovo.players.connections.size);
             try {
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
                     val receivedText = frame.readText()
-                    Glovo.generalMessage(receivedText,thisConnection)
-//                        ?:
-//                    Glovo.roomMessage(receivedText,)
+                    Glovo.generalMessage(receivedText,thisConnection) ?:
+                    Glovo.roomMessage(receivedText,Glovo.rooms.getPlayerRoom(thisConnection))
 
 
                 }

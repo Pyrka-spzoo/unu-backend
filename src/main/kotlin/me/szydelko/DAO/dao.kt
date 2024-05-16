@@ -17,11 +17,11 @@ class ConnectionWS(val session: DefaultWebSocketSession) {
     var name = "user${id}"
 }
 
-class Room(owner: String, val cardSet: List<CardItem> = CardSet.default) {
+class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
     companion object {
         val lastId = AtomicInteger(0)
     }
-    val id = ConnectionWS.lastId.getAndIncrement()
+    val id = Room.lastId.getAndIncrement()
     val users = mutableListOf(owner)
     var direction = true
     var lastCard = cardSet[Random.nextInt(0,cardSet.size)].let { Card(it.symbol,it.color) }

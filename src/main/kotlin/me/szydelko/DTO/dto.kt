@@ -9,4 +9,7 @@ data class Card(val symbol: String,val color: String)
 data class CardItem(val symbol: String,val color: String,val limit : Int);
 
 @Serializable
-data class NameDTO(val name: String);
+data class UserDTO(val name: String,val isInRoom: Boolean);
+
+@Serializable
+data class MessageDTO(val message: String,val payload: MutableMap<String,String>);
