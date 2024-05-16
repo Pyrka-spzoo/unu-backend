@@ -1,6 +1,8 @@
 package me.szydelko
 
 import io.ktor.server.application.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import me.szydelko.plugins.*
 
 fun main(args: Array<String>) {

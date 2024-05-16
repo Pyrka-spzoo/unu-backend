@@ -1,11 +1,20 @@
 package me.szydelko.plugins
 
 import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import me.szydelko.DAO.ConnectionWS
+import me.szydelko.companion.Glovo
+import me.szydelko.controller.generalMessage
+import me.szydelko.controller.players
+import me.szydelko.controller.roomMessage
+import me.szydelko.controller.rooms
 import java.time.Duration
+import java.util.concurrent.CopyOnWriteArrayList
+
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -14,16 +23,50 @@ fun Application.configureSockets() {
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
+//    routing {
+//        val connections =  CopyOnWriteArrayList<ConnectionWS>()
+//        webSocket("/chat") {
+//            println("Adding user!")
+//            val thisConnection = ConnectionWS(this)
+//            connections += thisConnection
+//            try {
+//                send("You are connected! There are ${connections.count()} users here.")
+//                for (frame in incoming) {
+//                    frame as? Frame.Text ?: continue
+//                    val receivedText = frame.readText()
+//                    val textWithUsername = "[${thisConnection.name}]: $receivedText"
+//                    connections.forEach {
+//                        it.session.send(textWithUsername)
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                println(e.localizedMessage)
+//            } finally {
+//                println("Removing $thisConnection!")
+//                connections -= thisConnection
+//            }
+//        }
+//    }
+
     routing {
-        webSocket("/ws") { // websocketSession
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    }
+        webSocket("/ws") {
+            val thisConnection = ConnectionWS(this)
+            Glovo.players.connections += thisConnection
+            try {
+                for (frame in incoming) {
+                    frame as? Frame.Text ?: continue
+                    val receivedText = frame.readText()
+                    Glovo.generalMessage(receivedText,thisConnection)
+//                        ?:
+//                    Glovo.roomMessage(receivedText,)
+
+
                 }
+            } catch (e: Exception) {
+                println(e.localizedMessage)
+            } finally {
+                println("Removing $thisConnection!")
+                Glovo.players.connections -= thisConnection
             }
         }
     }
