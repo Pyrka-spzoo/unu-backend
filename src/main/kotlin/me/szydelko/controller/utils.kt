@@ -60,9 +60,20 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
             val idJson = payload.jsonObject["id"]
             (idJson != null) ?: return false
             val id = idJson!!.jsonPrimitive.int
-
-
-
+            try {
+                Glovo.rooms.joinToRoom(connectionWS,id)
+            }catch (e:Exception){ // @TODO rozrurzniać błedy
+                runBlocking {
+                    connectionWS.session.send(Json.encodeToString(MessageDTO("error", mutableMapOf())))
+                }
+              return false
+            }
+            runBlocking {
+                Glovo.rooms.getPlayerRoom(connectionWS).users.forEach() {
+                    it.session.send(Json.encodeToString(MessageDTO("join", mutableMapOf("name" to connectionWS.name)))
+                } // @TODO zrobić z tego asychroniczne tak rzeby sie wykonywało
+            }
+            return true
         }
 
     }

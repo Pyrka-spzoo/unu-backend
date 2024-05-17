@@ -18,7 +18,9 @@ interface RoomController {
 
     fun createRoom(connectionWS: ConnectionWS,cardSet: List<CardItem> = CardSet.default): Int
 
-}
+    fun joinToRoom(connectionWS: ConnectionWS,id: Int): Int
+
+    }
 
 val Glovo.Companion.rooms: RoomController by lazy {
     object : RoomController {
@@ -45,6 +47,12 @@ val Glovo.Companion.rooms: RoomController by lazy {
             val element = Room(connectionWS, cardSet)
             _rooms.add(element);
             return element.id;
+        }
+
+        override fun joinToRoom(connectionWS: ConnectionWS,id: Int): Int {
+            if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
+            _rooms.find { it.id == id }?.users?.add(connectionWS) ?: throw Exception();
+            return id;
         }
 
 
