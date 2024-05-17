@@ -1,20 +1,23 @@
 package me.szydelko.controller
 
 import io.ktor.websocket.*
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.Room
 import me.szydelko.DTO.MessageDTO
+import me.szydelko.DTO.RoomDTO
 import me.szydelko.DTO.UserDTO
 import me.szydelko.companion.Glovo
 
 fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS): Boolean {
 
-    val payload = Json.parseToJsonElement(message);
+    val payload = Json.parseToJsonElement(message); // @TODO sprawdzać czy napewno jest message w json
     when (payload.jsonObject["message"]!!.jsonPrimitive.content) {
         "rename" -> {
             connectionWS.name = payload.jsonObject["name"]!!.jsonPrimitive.content
@@ -28,6 +31,20 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
             return true
         }
 
+        "listRooms" -> {
+            runBlocking {
+                connectionWS.session.send(Json.encodeToString(Glovo.rooms.rooms.map { RoomDTO(it.id,it.users.map { it.name }.toMutableList()) }))
+            }
+            return true
+        }
+
+        "listUsers" -> {
+            runBlocking {
+                connectionWS.session.send(Json.encodeToString(Glovo.players.connections.map { UserDTO(it.name,rooms.isInRoom(it)) }))
+            }
+            return true
+        }
+
         "createRoom" -> {
             val idRoom = rooms.createRoom(connectionWS)
             runBlocking {
@@ -37,6 +54,15 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                 }
             }
             return true
+        }
+
+        "joinToRoom" -> {
+            val idJson = payload.jsonObject["id"]
+            (idJson != null) ?: return false
+            val id = idJson!!.jsonPrimitive.int
+
+
+
         }
 
     }

@@ -65,8 +65,8 @@ fun Application.configureSockets() {
             } catch (e: Exception) {
                 println(e.localizedMessage)
             } finally {
-                println("Removing $thisConnection!")
                 Glovo.players.connections -= thisConnection
+                // @TODO jeśli jest w pokoju musi z nego wyjść
             }
         }
     }
