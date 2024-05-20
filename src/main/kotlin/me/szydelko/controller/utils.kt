@@ -70,7 +70,7 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
             }
             runBlocking {
                 Glovo.rooms.getPlayerRoom(connectionWS).users.forEach() {
-                    it.session.send(Json.encodeToString(MessageDTO("join", mutableMapOf("name" to connectionWS.name)))
+                    it.session.send(Json.encodeToString(MessageDTO("join", mutableMapOf("name" to connectionWS.name))))
                 } // @TODO zrobić z tego asychroniczne tak rzeby sie wykonywało
             }
             return true
