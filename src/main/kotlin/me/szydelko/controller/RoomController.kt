@@ -71,8 +71,6 @@ val Glovo.Companion.rooms: RoomController by lazy {
             val connectionWS1 = playerRoom.users.find { it.name == name } ?: return false; // @TODO wysukiwanie po id a nie po name bo random bedzie
             getPlayerRoom(connectionWS).users -= connectionWS1;
             return true
-
-
         }
 
 

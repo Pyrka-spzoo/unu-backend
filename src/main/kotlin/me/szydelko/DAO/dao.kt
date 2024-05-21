@@ -31,15 +31,18 @@ class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
         return ((cardList.filterKeys { it == card }.values.first()) < (cardSet.find { it.let { Card(it.symbol,it.color) } == card }!!.limit))
     }
 
-    fun getNextCard(): Card{
-        var tmp :Card;
-        do {
-            tmp = cardSet[Random.nextInt(0,cardSet.size)].let { Card(it.symbol,it.color) }
-        }while (ifCardIsInDeck(tmp))
+//    fun getNextCard(): Card{
+//        var tmp :Card;
+//        do {
+//            tmp = cardSet[Random.nextInt(0,cardSet.size)].let { Card(it.symbol,it.color) }
+//        }while (ifCardIsInDeck(tmp))
+//
+//        cardList[tmp] = cardList.getOrPut(tmp) { 0 } + 1
+//
+//        return tmp;
+//    }
 
-        cardList[tmp] = cardList.getOrPut(tmp) { 0 } + 1
-
-        return tmp;
-    }
 }
+
+
 

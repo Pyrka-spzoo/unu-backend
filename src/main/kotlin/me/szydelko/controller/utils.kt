@@ -71,22 +71,28 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
             return true
         }
 
-        "leaveTheRoom" -> {
 
-        }
-
-        "kickOutRoom" -> {
-            val name = payload.jsonObject["name"]?.jsonPrimitive?.intOrNull ?: return false
-
-
-        }
 
     }
 //    {"message":"rename","name":"joo"}
     return false
 }
 
-fun Glovo.Companion.roomMessage(message: String, room: Room): Boolean {
+fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS, room: Room): Boolean {
+
+    val payload = Json.parseToJsonElement(message); // @TODO sprawdzać czy napewno jest message w json
+    when (payload.jsonObject["message"]!!.jsonPrimitive.content) {
+
+        "leaveTheRoom" -> {
+            Glovo.rooms.leaveTheRoom(connectionWS);
+        }
+
+        "kickOutRoom" -> {
+            val name = payload.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: return false
+            return Glovo.rooms.kickOutRoom(connectionWS,name);
+        }
+
+    }
 
 
     return false
