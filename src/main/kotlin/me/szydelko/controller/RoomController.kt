@@ -20,6 +20,10 @@ interface RoomController {
 
     fun joinToRoom(connectionWS: ConnectionWS,id: Int): Int
 
+    fun leaveTheRoom(connectionWS: ConnectionWS)
+
+    fun kickOutRoom(connectionWS: ConnectionWS,name: String): Boolean
+
     }
 
 val Glovo.Companion.rooms: RoomController by lazy {
@@ -53,6 +57,22 @@ val Glovo.Companion.rooms: RoomController by lazy {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
             _rooms.find { it.id == id }?.users?.add(connectionWS) ?: throw Exception();
             return id;
+        }
+
+        override fun leaveTheRoom(connectionWS: ConnectionWS) {
+            if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
+            getPlayerRoom(connectionWS).users -= connectionWS;
+        }
+
+        override fun kickOutRoom(connectionWS: ConnectionWS,name: String): Boolean {
+            if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
+            val playerRoom = getPlayerRoom(connectionWS)
+            if (playerRoom.users.first().name == connectionWS.name) return false
+            val connectionWS1 = playerRoom.users.find { it.name == name } ?: return false; // @TODO wysukiwanie po id a nie po name bo random bedzie
+            getPlayerRoom(connectionWS).users -= connectionWS1;
+            return true
+
+
         }
 
 

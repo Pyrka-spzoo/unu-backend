@@ -4,10 +4,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.Room
 import me.szydelko.DTO.MessageDTO
@@ -57,16 +54,14 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
         }
 
         "joinToRoom" -> {
-            val idJson = payload.jsonObject["id"]
-            (idJson != null) ?: return false
-            val id = idJson!!.jsonPrimitive.int
+            val id = payload.jsonObject["id"]?.jsonPrimitive?.intOrNull ?: return false
             try {
                 Glovo.rooms.joinToRoom(connectionWS,id)
             }catch (e:Exception){ // @TODO rozrurzniać błedy
                 runBlocking {
                     connectionWS.session.send(Json.encodeToString(MessageDTO("error", mutableMapOf())))
                 }
-              return false
+                throw e;
             }
             runBlocking {
                 Glovo.rooms.getPlayerRoom(connectionWS).users.forEach() {
@@ -74,6 +69,16 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                 } // @TODO zrobić z tego asychroniczne tak rzeby sie wykonywało
             }
             return true
+        }
+
+        "leaveTheRoom" -> {
+
+        }
+
+        "kickOutRoom" -> {
+            val name = payload.jsonObject["name"]?.jsonPrimitive?.intOrNull ?: return false
+
+
         }
 
     }

@@ -57,8 +57,12 @@ fun Application.configureSockets() {
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
                     val receivedText = frame.readText()
-                    Glovo.generalMessage(receivedText,thisConnection) ?:
-                    Glovo.roomMessage(receivedText,Glovo.rooms.getPlayerRoom(thisConnection))
+                    try {
+                        Glovo.generalMessage(receivedText,thisConnection) ?:
+                        Glovo.roomMessage(receivedText,Glovo.rooms.getPlayerRoom(thisConnection))
+                    }catch (e:Exception){
+
+                    }
 
 
                 }
