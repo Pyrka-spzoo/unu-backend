@@ -1,12 +1,11 @@
 package me.szydelko.controller
 
 import io.ktor.websocket.*
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import me.szydelko.DAO.ConnectionWS
-import me.szydelko.DAO.Room
+import me.szydelko.DAO.RoomHandler
 import me.szydelko.DTO.MessageDTO
 import me.szydelko.DTO.RoomDTO
 import me.szydelko.DTO.UserDTO
@@ -30,12 +29,12 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
 
         "listRooms" -> {
             runBlocking {
-                connectionWS.session.send(Json.encodeToString(Glovo.rooms.rooms.map { RoomDTO(it.id,it.users.map { it.name }.toMutableList()) }))
+                connectionWS.session.send(Json.encodeToString(Glovo.rooms.rooms.map { RoomDTO(it.id,it.players.map { it.name }.toMutableList()) }))
             }
             return true
         }
 
-        "listUsers" -> {
+        "listPlayers" -> {
             runBlocking {
                 connectionWS.session.send(Json.encodeToString(Glovo.players.connections.map { UserDTO(it.name,rooms.isInRoom(it)) }))
             }
@@ -50,6 +49,7 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                     it.session.send(Json.encodeToString(MessageDTO("newRoom", mutableMapOf("id" to idRoom.toString()))))
                 }
             }
+            connectionWS.cards.clear();
             return true
         }
 
@@ -64,33 +64,61 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                 throw e;
             }
             runBlocking {
-                Glovo.rooms.getPlayerRoom(connectionWS).users.forEach() {
+                Glovo.rooms.getPlayerRoom(connectionWS).players.forEach() {
                     it.session.send(Json.encodeToString(MessageDTO("join", mutableMapOf("name" to connectionWS.name))))
                 } // @TODO zrobić z tego asychroniczne tak rzeby sie wykonywało
             }
+            connectionWS.cards.clear();
             return true
         }
 
-
+//        "leaveTheRoom" -> {
+//            Glovo.rooms.leaveTheRoom(connectionWS);
+//        }
+//
+//        "kickOutRoom" -> {
+//            val name = payload.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: return false
+//            return Glovo.rooms.kickOutRoom(connectionWS,name);
+//        }
 
     }
 //    {"message":"rename","name":"joo"}
     return false
 }
 
-fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS, room: Room): Boolean {
+fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS): Boolean {
+
+    val roomHandler = connectionWS.RoomHandler() // @TODO w konstruktorze handlera powinno sie badać czy wszystko dobrze
 
     val payload = Json.parseToJsonElement(message); // @TODO sprawdzać czy napewno jest message w json
     when (payload.jsonObject["message"]!!.jsonPrimitive.content) {
 
         "leaveTheRoom" -> {
-            Glovo.rooms.leaveTheRoom(connectionWS);
+            roomHandler.leaveTheRoom()
         }
 
         "kickOutRoom" -> {
             val name = payload.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: return false
-            return Glovo.rooms.kickOutRoom(connectionWS,name);
+            return roomHandler.kickOutRoom(name);
         }
+
+        "getCard" -> {
+            val card = roomHandler.getCard();
+            runBlocking {
+                connectionWS.session.send(Json.encodeToString(card))
+            }
+        }
+
+        "getMyCards" -> {
+            runBlocking {
+                connectionWS.session.send(Json.encodeToString(connectionWS.cards))
+            }
+        }
+
+        "putCard" -> {
+
+        }
+
 
     }
 

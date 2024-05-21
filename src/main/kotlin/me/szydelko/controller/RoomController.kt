@@ -3,6 +3,8 @@ package me.szydelko.controller
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.Room
 import me.szydelko.DTO.CardItem
+import me.szydelko.DTO.count
+import me.szydelko.DTO.symbol
 import me.szydelko.companion.CardSet
 import me.szydelko.companion.Glovo
 import java.util.concurrent.CopyOnWriteArrayList
@@ -36,14 +38,14 @@ val Glovo.Companion.rooms: RoomController by lazy {
 
         override fun isInRoom(connectionWS: ConnectionWS) =
             _rooms.any {
-                it.users.any() { c ->
+                it.players.any() { c ->
                     c.session == connectionWS.session
                 }
             }
 
         override fun getPlayerRoom(connectionWS: ConnectionWS): Room {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
-            return _rooms.find { it.users.any { c -> c.session == connectionWS.session } }!!;
+            return _rooms.find { it.players.any { c -> c.session == connectionWS.session } }!!;
         }
 
         override fun createRoom(connectionWS: ConnectionWS, cardSet: List<CardItem>): Int {
@@ -55,21 +57,21 @@ val Glovo.Companion.rooms: RoomController by lazy {
 
         override fun joinToRoom(connectionWS: ConnectionWS,id: Int): Int {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
-            _rooms.find { it.id == id }?.users?.add(connectionWS) ?: throw Exception();
+            _rooms.find { it.id == id }?.players?.add(connectionWS) ?: throw Exception();
             return id;
         }
 
         override fun leaveTheRoom(connectionWS: ConnectionWS) {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
-            getPlayerRoom(connectionWS).users -= connectionWS;
+            getPlayerRoom(connectionWS).players -= connectionWS;
         }
 
         override fun kickOutRoom(connectionWS: ConnectionWS,name: String): Boolean {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
             val playerRoom = getPlayerRoom(connectionWS)
-            if (playerRoom.users.first().name == connectionWS.name) return false
-            val connectionWS1 = playerRoom.users.find { it.name == name } ?: return false; // @TODO wysukiwanie po id a nie po name bo random bedzie
-            getPlayerRoom(connectionWS).users -= connectionWS1;
+            if (playerRoom.players.first().name == connectionWS.name) return false
+            val connectionWS1 = playerRoom.players.find { it.name == name } ?: return false; // @TODO wysukiwanie po id a nie po name bo random bedzie
+            getPlayerRoom(connectionWS).players -= connectionWS1;
             return true
         }
 
