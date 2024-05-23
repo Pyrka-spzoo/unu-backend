@@ -30,7 +30,9 @@ class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
     val cardList = mutableMapOf(lastCard to 1);
 
     fun ifCardIsInDeck(card: Card) : Boolean{
-        return ((cardList.filterKeys { it == card }.values.firstOrNull() ?: throw Exception("nie ma takiej karty w wykorzystywanych kartach (card list)")) < (cardSet.find { it.toCard() == card }!!.count)) // @TODO xd exception
+        val i = cardSet.find { it.toCard() == card }?.count ?: throw Exception("nie ma takiej karty w tali")
+        val i1 = cardList.filterKeys { it == card }.values.firstOrNull() ?: return (i > 0)
+        return (i1 < i) // @TODO xd exception
     }
 
 //    fun getNextCard(): Card{
