@@ -60,11 +60,10 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
             newCard = room.cardSet[nextInt].toCard()
         }while (room.ifCardIsInDeck(newCard) && tmp != nextInt)
 
-        room.cardSet.find { it.toCard() == newCard }
-            ?.let { it.count++ } ?: {
-                connectionWS.cards.add(CardItem(newCard.symbol, newCard.color, 1))
-                room.cardList[newCard] = room.cardList.getOrPut(newCard) { 0 } + 1
-            }
+        connectionWS.cards.firstOrNull { it.toCard() == newCard }
+            ?.let { it.count++ } ?: connectionWS.cards.add(CardItem(newCard.symbol, newCard.color, 1))
+
+        room.cardList[newCard] = room.cardList.getOrPut(newCard) { 0 } + 1
 
         return newCard;
     }
