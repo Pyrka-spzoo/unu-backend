@@ -3,7 +3,7 @@ package me.szydelko.DAO
 import io.ktor.websocket.*
 import me.szydelko.DTO.Card
 import me.szydelko.DTO.CardItem
-import me.szydelko.DTO.getCard
+import me.szydelko.DTO.toCard
 import me.szydelko.companion.CardSet
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
@@ -25,7 +25,8 @@ class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
     val id = Room.lastId.getAndIncrement()
     val players = mutableListOf(owner)
     var direction = true
-    var lastCard = cardSet[Random.nextInt(0,cardSet.size)].getCard()
+    var turnIndex = 0; // @TODO Bazpiecznie usówać graczy z przesówaniem indexów
+    var lastCard = cardSet[Random.nextInt(0,cardSet.size)].toCard()
     val cardList = mutableMapOf(lastCard to 1);
 
     fun ifCardIsInDeck(card: Card) : Boolean{

@@ -11,7 +11,7 @@ infix fun String.symbol(symbol: String): Card = Card(symbol,this)
 data class CardItem(val symbol: String,var color: String,var count : Int);
 
 infix fun Card.count(count : Int): CardItem = CardItem(this.symbol,this.color,count)
-fun CardItem.getCard() = Card(this.symbol,this.color)
+fun CardItem.toCard() = Card(this.symbol,this.color)
 
 @Serializable
 data class UserDTO(val name: String,val isInRoom: Boolean);

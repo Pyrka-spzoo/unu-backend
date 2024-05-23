@@ -6,6 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.RoomHandler
+import me.szydelko.DTO.Card
 import me.szydelko.DTO.MessageDTO
 import me.szydelko.DTO.RoomDTO
 import me.szydelko.DTO.UserDTO
@@ -95,6 +96,7 @@ fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS): Bo
 
         "leaveTheRoom" -> {
             roomHandler.leaveTheRoom()
+            return true
         }
 
         "kickOutRoom" -> {
@@ -107,16 +109,22 @@ fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS): Bo
             runBlocking {
                 connectionWS.session.send(Json.encodeToString(card))
             }
+            return true
         }
 
         "getMyCards" -> {
             runBlocking {
                 connectionWS.session.send(Json.encodeToString(connectionWS.cards))
             }
+            return true
         }
 
         "putCard" -> {
 
+            val json = payload.jsonObject["card"]?.jsonObject ?: throw Exception() // @TODO dać jakiś exc związany z strupkurą
+            val card = Json.decodeFromJsonElement<Card>(json)
+            roomHandler.putCard(card,payload)
+            return true
         }
 
 
