@@ -58,7 +58,11 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
         do {
             nextInt = (nextInt + 1).takeIf { it < room.cardSet.size } ?: 0
             newCard = room.cardSet[nextInt].toCard()
-        }while (room.ifCardIsInDeck(newCard) && tmp != nextInt)
+        }while (!room.ifCardIsInDeck(newCard) && tmp != nextInt)
+
+        if (tmp == nextInt){
+            // @TODO nowa tali
+        }
 
         connectionWS.cards.firstOrNull { it.toCard() == newCard }
             ?.let { it.count++ } ?: connectionWS.cards.add(CardItem(newCard.symbol, newCard.color, 1))
