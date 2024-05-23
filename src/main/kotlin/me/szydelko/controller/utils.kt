@@ -50,7 +50,6 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                     it.session.send(Json.encodeToString(MessageDTO("newRoom", mutableMapOf("id" to idRoom.toString()))))
                 }
             }
-            connectionWS.cards.clear();
             return true
         }
 
@@ -69,7 +68,6 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
                     it.session.send(Json.encodeToString(MessageDTO("join", mutableMapOf("name" to connectionWS.name))))
                 } // @TODO zrobić z tego asychroniczne tak rzeby sie wykonywało
             }
-            connectionWS.cards.clear();
             return true
         }
 

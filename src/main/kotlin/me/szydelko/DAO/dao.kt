@@ -23,7 +23,13 @@ class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
         val lastId = AtomicInteger(0)
     }
     val id = Room.lastId.getAndIncrement()
-    val players = mutableListOf(owner)
+    val players = mutableListOf(owner.let {
+        it.cards.clear()
+        val roomHandler = it.RoomHandler()
+        for (n in 1..7)
+            roomHandler.getCard();
+        return@let it
+    })
     var direction = true
     var turnIndex = 0; // @TODO Bazpiecznie usówać graczy z przesówaniem indexów
     var lastCard = cardSet[Random.nextInt(0,cardSet.size)].toCard()

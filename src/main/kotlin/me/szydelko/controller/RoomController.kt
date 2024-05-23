@@ -2,6 +2,7 @@ package me.szydelko.controller
 
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.Room
+import me.szydelko.DAO.RoomHandler
 import me.szydelko.DTO.CardItem
 import me.szydelko.DTO.count
 import me.szydelko.DTO.symbol
@@ -57,7 +58,11 @@ val Glovo.Companion.rooms: RoomController by lazy {
 
         override fun joinToRoom(connectionWS: ConnectionWS,id: Int): Int {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
+            connectionWS.cards.clear()
             _rooms.find { it.id == id }?.players?.add(connectionWS) ?: throw Exception();
+            val roomHandler = connectionWS.RoomHandler()
+            for (n in 1..7)
+                roomHandler.getCard();
             return id;
         }
 

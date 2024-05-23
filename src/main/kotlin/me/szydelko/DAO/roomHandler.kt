@@ -61,7 +61,7 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
         }while (!room.ifCardIsInDeck(newCard) && tmp != nextInt)
 
         if (tmp == nextInt){
-            // @TODO nowa tali
+            // @TODO nowa tali i jeszcew raz wylosować new card
         }
 
         connectionWS.cards.firstOrNull { it.toCard() == newCard }
