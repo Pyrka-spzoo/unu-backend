@@ -44,7 +44,7 @@ val Glovo.Companion.rooms: RoomController by lazy {
             }
 
         override fun getPlayerRoom(connectionWS: ConnectionWS): Room {
-            if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
+            if (!isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
             return _rooms.find { it.players.any { c -> c.session == connectionWS.session } }!!;
         }
 

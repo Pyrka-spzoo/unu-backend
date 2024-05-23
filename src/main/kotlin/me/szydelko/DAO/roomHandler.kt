@@ -10,9 +10,9 @@ import kotlin.random.Random
 
 class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
 
-    fun nextPlayer(hopBy:Int = 1): Int{
+     fun nextPlayer(hopBy:Int = 1): Int{
 
-        (hopBy >= 0) ?: throw Exception() // @TODO lepiej zaimplementować
+        if(hopBy >= 0) throw Exception() // @TODO lepiej zaimplementować
 
         var hop = hopBy
         if (hop >= room.players.size){
@@ -49,6 +49,9 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
     }
 
     fun getCard(): Card {
+
+        if(room.players.indexOf(connectionWS) != room.turnIndex) throw Exception("nie twoja tura");
+
         var newCard : Card;
         var nextInt = Random.nextInt(0, room.cardSet.size)
         val tmp = nextInt
@@ -68,33 +71,40 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
 
     fun putCard(card: Card,payload: JsonElement): Card{
 
+        if(room.players.indexOf(connectionWS) != room.turnIndex)  throw Exception("nie twoja tura");
         val item = connectionWS.cards.find { it.toCard() == card } ?: throw Exception() // @TODO znowu uwjątki
 
         if(item.color == "black" ){
 
-            if(item.symbol == "color"){
-                val color = payload.jsonObject["changedColor"]?.jsonPrimitive?.contentOrNull ?: throw Exception() // @TODO shemat
-                item.color = color
-                room.lastCard = item.toCard()
-                return item.toCard();
-            }
-
             if(item.symbol == "+4"){
-                val color = payload.jsonObject["changedColor"]?.jsonPrimitive?.contentOrNull ?: throw Exception() // @TODO shemat
-                item.color = color
                 for (n in 1..4)
                 room.players[nextPlayer()].RoomHandler().getCard()
-                room.lastCard = item.toCard()
-                return item.toCard();
             }
+
+            val color = payload.jsonObject["changedColor"]?.jsonPrimitive?.contentOrNull ?: throw Exception() // @TODO shemat
+            item.color = color
+            room.lastCard = item.toCard()
+            room.turnIndex = nextPlayer()
+            return item.toCard();
 
         } else if (item.color == room.lastCard.color || item.symbol == room.lastCard.symbol){
 
+            if (item.symbol == "stop"){
+                room.turnIndex = nextPlayer()
+            }
+            if (item.symbol == "<=>"){
+                room.direction = !room.direction
+            }
+            if (item.symbol == "+2"){
+                for (n in 1..2)
+                    room.players[nextPlayer()].RoomHandler().getCard()
+            }
 
-
+            room.turnIndex = nextPlayer()
+            return item.toCard()
         }
 
-
+        throw Exception("WTF nie mam takiej karty / gracz wybrał złą") // @TODO znowu exception
 
     }
 

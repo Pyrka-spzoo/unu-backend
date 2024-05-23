@@ -58,8 +58,8 @@ fun Application.configureSockets() {
                     frame as? Frame.Text ?: continue
                     val receivedText = frame.readText()
                     try {
-                        Glovo.generalMessage(receivedText,thisConnection) ?:
-                        Glovo.roomMessage(receivedText,thisConnection)
+                        if(Glovo.generalMessage(receivedText,thisConnection)) continue
+                        if(Glovo.roomMessage(receivedText,thisConnection)) continue
                     }catch (e:Exception){
 
                     }
