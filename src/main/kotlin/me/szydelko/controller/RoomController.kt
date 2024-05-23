@@ -53,6 +53,10 @@ val Glovo.Companion.rooms: RoomController by lazy {
             if (isInRoom(connectionWS)) throw Exception(); // @TODO dodać normalne wyjątki
             val element = Room(connectionWS, cardSet)
             _rooms.add(element);
+            connectionWS.cards.clear()
+            val roomHandler = connectionWS.RoomHandler()
+            for (n in 1..7)
+                roomHandler.getCard();
             return element.id;
         }
 
