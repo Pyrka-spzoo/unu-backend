@@ -48,9 +48,9 @@ class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
         return true
     }
 
-    fun getCard(): Card {
+    fun getCard(getCardIfNotYourTurn :Boolean = false): Card {
 
-        if(room.players.indexOf(connectionWS) != room.turnIndex) throw Exception("nie twoja tura");
+        if(room.players.indexOf(connectionWS) != room.turnIndex && ! getCardIfNotYourTurn) throw Exception("nie twoja tura");
 
         var newCard : Card;
         var nextInt = Random.nextInt(0, room.cardSet.size)

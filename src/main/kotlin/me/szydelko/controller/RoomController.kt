@@ -66,7 +66,7 @@ val Glovo.Companion.rooms: RoomController by lazy {
             _rooms.find { it.id == id }?.players?.add(connectionWS) ?: throw Exception();
             val roomHandler = connectionWS.RoomHandler()
             for (n in 1..7)
-                roomHandler.getCard();
+                roomHandler.getCard(true);
             return id;
         }
 
