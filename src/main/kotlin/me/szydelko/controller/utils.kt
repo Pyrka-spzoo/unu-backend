@@ -6,10 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import me.szydelko.DAO.ConnectionWS
 import me.szydelko.DAO.RoomHandler
-import me.szydelko.DTO.Card
-import me.szydelko.DTO.MessageDTO
-import me.szydelko.DTO.RoomDTO
-import me.szydelko.DTO.UserDTO
+import me.szydelko.DTO.*
 import me.szydelko.companion.Glovo
 
 fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS): Boolean {
@@ -23,21 +20,22 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
 
         "myInfo" -> {
             runBlocking {
-                connectionWS.session.send(Json.encodeToString(UserDTO(connectionWS.name, rooms.isInRoom(connectionWS))))
+//                connectionWS.session.send(Json.encodeToString(MessageDTO2("myInfo",Json.encodeToJsonElement(UserDTO(connectionWS.name, rooms.isInRoom(connectionWS))))))
+                connectionWS.session.send(Json.encodeToString("myInfo" payload UserDTO(connectionWS.name, rooms.isInRoom(connectionWS))))
             }
             return true
         }
 
         "listRooms" -> {
             runBlocking {
-                connectionWS.session.send(Json.encodeToString(Glovo.rooms.rooms.map { RoomDTO(it.id,it.players.map { it.name }.toMutableList()) }))
+                connectionWS.session.send(Json.encodeToString( "listRoom" payload Glovo.rooms.rooms.map { RoomDTO(it.id,it.players.map { it.name }.toMutableList()) }))
             }
             return true
         }
 
         "listPlayers" -> {
             runBlocking {
-                connectionWS.session.send(Json.encodeToString(Glovo.players.connections.map { UserDTO(it.name,rooms.isInRoom(it)) }))
+                connectionWS.session.send(Json.encodeToString(  "listPlayers" payload Glovo.players.connections.map { UserDTO(it.name,rooms.isInRoom(it)) }))
             }
             return true
         }
