@@ -3,6 +3,7 @@ package me.szydelko.DAO
 import io.ktor.websocket.*
 import me.szydelko.DTO.Card
 import me.szydelko.DTO.CardItem
+import me.szydelko.DTO.Jsonable
 import me.szydelko.DTO.toCard
 import me.szydelko.companion.CardSet
 import java.util.concurrent.atomic.AtomicInteger
@@ -15,7 +16,11 @@ class ConnectionWS(val session: DefaultWebSocketSession) {
     val id = lastId.getAndIncrement()
     var name = "user${id}"
     val cards: MutableList<CardItem> = mutableListOf()
+
+    suspend fun sendJsonable(jsonable: Jsonable) = session.send(jsonable.toJson())
 }
+
+
 
 
 class Room(owner: ConnectionWS, val cardSet: List<CardItem> = CardSet.default) {
