@@ -61,7 +61,8 @@ sealed class Mess(val message: String) : Jsonable {
     data class MyInfo(val payload: UserDTO) : Mess("myInfo");
     @Serializable
     data class ListRooms(val payload: List<RoomDTO>) : Mess("listRooms");
-
+    @Serializable
+    data class ListPlayers(val payload: List<UserDTO>) : Mess("listRooms");
 
 
 
