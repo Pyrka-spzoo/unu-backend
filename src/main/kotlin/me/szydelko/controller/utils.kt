@@ -5,9 +5,49 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import me.szydelko.DAO.ConnectionWS
+import me.szydelko.DAO.Room
 import me.szydelko.DAO.RoomHandler
 import me.szydelko.companion.Glovo
 import me.szydelko.DTO.*
+
+interface Sendable {
+   suspend fun send();
+}
+
+sealed class MessSendable() : Sendable {
+
+    data class SendToEveryone(val toJson: ToJson) : MessSendable()
+
+    data class SendToOne(val toJson: ToJson, val connectionWS: ConnectionWS) : MessSendable()
+
+    data class SendToMultiple(val toJson: ToJson, val listConnectionWS: List<ConnectionWS>) : MessSendable()
+
+    data class SendToRoom(val toJson: ToJson, val room: Room) : MessSendable()
+
+    data class SendToRoomFromConn(val toJson: ToJson, val connectionWS: ConnectionWS) : MessSendable()
+
+
+    override suspend fun send() {
+         when (this) {
+            is SendToEveryone -> {
+                Glovo.players.connections.forEach { it.session.send(toJson.toJson()) }
+            }
+            is SendToOne -> { connectionWS.session.send(toJson.toJson()) }
+            is SendToMultiple -> { listConnectionWS.forEach { it.session.send(toJson.toJson()) } }
+            is SendToRoom -> { room.players.forEach { it.session.send(toJson.toJson()) } }
+            is SendToRoomFromConn -> { connectionWS.RoomHandler().room.players.forEach { it.session.send(toJson.toJson()) } }
+        }
+    }
+}
+
+data class ListSendable(val listSendable: List<Sendable>) : Sendable{
+    override suspend fun send() {
+        listSendable.forEach{it.send()}
+    }
+}
+
+fun List<Sendable>.toSendable() : ListSendable = ListSendable(this);
+
 
 fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS): Boolean {
 
