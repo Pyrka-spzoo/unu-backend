@@ -48,11 +48,17 @@ data class ListSendable(val listSendable: List<Sendable>) : Sendable{
 
 fun List<Sendable>.toSendable() : ListSendable = ListSendable(this);
 
+val jsonR = Json(){
+    ignoreUnknownKeys = true;
+}
 
 fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS): Boolean {
 
     val payload = Json.parseToJsonElement(message); // @TODO sprawdzać czy napewno jest message w json
-    when (payload.jsonObject["message"]!!.jsonPrimitive.content) {
+
+    val message = jsonR.decodeFromJsonElement<Message>(payload);
+//    payload.jsonObject["message"]!!.jsonPrimitive.content
+    when (message.message) {
         "rename" -> {
             connectionWS.name = payload.jsonObject["name"]!!.jsonPrimitive.content
             return true
