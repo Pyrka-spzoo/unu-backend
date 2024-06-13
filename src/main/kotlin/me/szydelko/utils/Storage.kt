@@ -11,5 +11,9 @@ data class Storage(var listEntities: MutableList<StorageEntity> = mutableListOf(
         listEntities.firstOrNull { it.id == id && it.value is T}?.apply { this.value = value } ?: listEntities.add(StorageEntity(id,value))
         return this
     }
+
+    inline fun <reified T : Any> remove(id: String? = null): Boolean {
+        return listEntities.removeIf { it.id == id && it.value is T }
+    }
 }
 
