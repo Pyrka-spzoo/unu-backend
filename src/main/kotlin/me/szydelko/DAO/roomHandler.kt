@@ -8,6 +8,7 @@ import me.szydelko.companion.Glovo
 import me.szydelko.controller.rooms
 import kotlin.random.Random
 
+
 class RoomHandler(val room: Room,val connectionWS: ConnectionWS) {
 
      fun nextPlayer(hopBy:Int = 1): Int{
