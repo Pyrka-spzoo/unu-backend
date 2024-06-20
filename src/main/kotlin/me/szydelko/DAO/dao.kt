@@ -3,6 +3,7 @@ package me.szydelko.DAO
 import io.ktor.websocket.*
 import me.szydelko.DTO.*
 import me.szydelko.companion.CardSet
+import me.szydelko.utils.Storage
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
@@ -12,6 +13,9 @@ class ConnectionWS(val session: DefaultWebSocketSession) {
     }
     val id = lastId.getAndIncrement()
     var name = "user${id}"
+    val storage = Storage()
+
+
     val cards: MutableList<CardItem> = mutableListOf()
 
     suspend fun sendJsonable(toJson: ToJson) = session.send(toJson.toJson())

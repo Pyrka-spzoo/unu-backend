@@ -51,7 +51,7 @@ fun List<Sendable>.toSendable() : ListSendable = ListSendable(this);
 val jsonR = Json(){
     ignoreUnknownKeys = true;
 }
-
+@Deprecated("nonono")
 fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS): Boolean {
 
     val payload = Json.parseToJsonElement(message); // @TODO sprawdzać czy napewno jest message w json
@@ -131,7 +131,7 @@ fun Glovo.Companion.generalMessage(message: String, connectionWS: ConnectionWS):
 //    {"message":"rename","name":"joo"}
     return false
 }
-
+@Deprecated("nonono")
 fun Glovo.Companion.roomMessage(message: String, connectionWS: ConnectionWS): Boolean {
 
     val roomHandler = connectionWS.RoomHandler() // @TODO w konstruktorze handlera powinno sie badać czy wszystko dobrze

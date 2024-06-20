@@ -9,20 +9,18 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+interface inu{
+   fun i()
+}
+
+class ta() : inu{
+    override fun i() {
+        println("inu")
+    }
+
+}
+
 fun Application.module() {
-
-    val storage = Storage()
-        .push("tak")
-        .push("nie","nie")
-        .push("tak2")
-        .push(3)
-
-    val tak : String = storage.get() ?: "null"
-    val nie : String = storage.get("nie") ?: "null"
-    val int : Int = storage.get() ?: 0
-
-    println("tak: $tak, ne: $nie , int $int")
-
     configureKoin()
     configureSockets()
     configureSerialization()
